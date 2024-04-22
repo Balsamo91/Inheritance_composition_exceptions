@@ -13,6 +13,19 @@ class Main:
         self.changes = changes
     
     def read_file(self):
+        
+        if not os.path.isfile(self.source):
+                print(f"\nSource file not found or is not a file: {self.source}")
+                with open(self.source, "w")as file:
+                    file.close()
+                    pass
+                self.list_files_in_directory()  # List files in the same directory
+                sys.exit(1)  # Exit the program
+        else:
+            if os.path.getsize(self.source) == 0:
+                print(f"\nSource file is empty: {self.source}\n")
+                sys.exit(1)  # Exit the program
+            
         if self.source.endswith('.csv'):
             return self.read_csv()
         elif self.source.endswith('.json'):
@@ -23,13 +36,23 @@ class Main:
             print('Unsupported file type.')
             return None
     
+    def list_files_in_directory(self):
+        try:
+            
+            files = [f for f in os.listdir(os.path.dirname(self.source)) if os.path.isfile(os.path.join(os.path.dirname(self.source), f))]
+            print("\nFiles in the directory:\n")
+            print("\n".join(files))
+        except FileNotFoundError:
+            print("\nDirectory not found.")
+            # sys.exit(1)
+    
     def read_csv(self):
         try:
             with open(self.source, 'r', newline='') as csvfile:
                 reader = list(csv.reader(csvfile))
                 print("\nOriginal CSV file:\n")
                 for row in reader:
-                    print(".".join(row))
+                    print(",".join(row))
                 return reader
         except FileNotFoundError:
             print(f"File not found: {self.source}")
@@ -40,7 +63,7 @@ class Main:
             with open(self.source, 'r') as jsonfile:
                 data = json.load(jsonfile)
                 print("\nOriginal JSON content:\n")
-                print(data)
+                self.print_json_table(data)
                 return data
         except FileNotFoundError:
             print(f"File not found: {self.source}")
@@ -48,13 +71,21 @@ class Main:
         except json.JSONDecodeError:
             print("Error decoding JSON.")
             return None
+    
+    def print_json_table(self, data):
+        if not data:
+            print("Cannot apply changes. Data not available.")
+            return
+
+        for row in data:
+            print(','.join(str(cell) for cell in row))
         
     def read_pickle(self):
         try:
             with open(self.source, 'rb') as picklefile:
                 data2 = pickle.load(picklefile)
                 print("\nOriginal Pickle content:\n")
-                print(data2)
+                self.print_pickle_table(data2)
                 return data2
         except FileNotFoundError:
             print(f"File not found: {self.source}")
@@ -63,10 +94,20 @@ class Main:
             print("Error unpickling data.")
             return None
         
+    def print_pickle_table(self, data):
+        if not data:
+            print("Cannnot apply changes. Data not available.")
+            return
+
+        # If data is a list of lists, print it as a table
+        for row in data:
+            print(','.join(str(cell) for cell in row))
+
+        
     def apply_changes(self, data):
         # Method to apply changes to the data
         if data is None:
-            print("Cannnot aply changes. Data not available.")
+            print("\nCannot apply changes. Data not available.")
             return None
         
         try:
@@ -105,7 +146,7 @@ class Main:
                 writer.writerows(data_csv)
                 print("\nModified CSV content saved successfully.\n")
                 for row in data_csv:
-                    print(f".".join(row))
+                    print(f",".join(row))
                 print("")
         except IOError:
             print(f"Error writing to file: {self.destination}")
@@ -115,7 +156,8 @@ class Main:
             with open(self.destination, 'w') as jsonfile:
                 json.dump(data_json, jsonfile, indent=4)
                 print("\nModified JSON content saved successfully.\n")
-                print(data_json)
+                self.print_json_table(data_json)
+                print("")
         except IOError:
             print(f"Error writing to file: {self.destination}")
 
@@ -124,7 +166,8 @@ class Main:
             with open(self.destination, 'wb') as picklefile:
                 pickle.dump(data_pickle, picklefile)
                 print("\nModified Pickle content saved successfully.\n")
-                print(data_pickle)
+                self.print_pickle_table(data_pickle)
+                print("")
         except IOError:
             print(f"Error writing to file: {self.destination}")
 

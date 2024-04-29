@@ -146,7 +146,7 @@ class Main:
                 writer.writerows(data_csv)
                 print("\nModified CSV content saved successfully.\n")
                 for row in data_csv:
-                    print(f",".join(row))
+                    print(f",".join(map(str, row)))
                 print("")
         except IOError:
             print(f"Error writing to file: {self.destination}")

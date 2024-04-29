@@ -1,4 +1,3 @@
-# Importing Modules
 import sys
 import os
 import csv
@@ -17,7 +16,7 @@ class Csv(Main):
         super().__init__(source, destination, changes)
 
     def read_file(self):
-    
+        
         if not os.path.isfile(self.source):
                 print(f"\nSource file not found or is not a file: {self.source}")
                 with open(self.source, "w")as file:
@@ -35,7 +34,7 @@ class Csv(Main):
         else:
             print('Unsupported file type.')
             return None
-
+    
     def list_files_in_directory(self):
         try:
             
@@ -45,7 +44,7 @@ class Csv(Main):
         except FileNotFoundError:
             print("\nDirectory not found.")
             # sys.exit(1)
-
+    
     def read_csv(self):
         try:
             with open(self.source, 'r', newline='') as csvfile:
@@ -57,7 +56,32 @@ class Csv(Main):
         except FileNotFoundError:
             print(f"File not found: {self.source}")
             return None
+
+    def apply_changes(self, data):
+        # Method to apply changes to the data
+        if data is None:
+            print("\nCannot apply changes. Data not available.")
+            return None
         
+        try:
+            for change in self.changes:
+                # Split each change into its components: column, row, and value
+                column, row, value = map(str.strip, change.split(","))
+
+                # Convert column and row to integers
+                column = int(column)
+                row = int(row)
+
+                # Update the value in the specified cell of the CSV data
+                data[row][column] = value
+
+            return data
+
+        # Print an error message if there's an issue with the changes
+        except ValueError or IndexError:
+            print("\nInvalid change, please retry!")
+            return None
+    
     def save_file(self, data_to_save):
         if self.destination.endswith('.csv'):
             self.save_csv(data_to_save)
@@ -75,7 +99,8 @@ class Csv(Main):
                 print("")
         except IOError:
             print(f"Error writing to file: {self.destination}")
-    
+
+
 class Json(Main):
     def __init__(self, source, destination, changes):
         super().__init__(source, destination, changes)
@@ -109,7 +134,7 @@ class Json(Main):
         except FileNotFoundError:
             print("\nDirectory not found.")
             # sys.exit(1)
-
+    
     def read_json(self):
         try:
             with open(self.source, 'r') as jsonfile:
@@ -132,6 +157,31 @@ class Json(Main):
         for row in data:
             print(','.join(str(cell) for cell in row))
 
+    def apply_changes(self, data):
+        # Method to apply changes to the data
+        if data is None:
+            print("\nCannot apply changes. Data not available.")
+            return None
+        
+        try:
+            for change in self.changes:
+                # Split each change into its components: column, row, and value
+                column, row, value = map(str.strip, change.split(","))
+
+                # Convert column and row to integers
+                column = int(column)
+                row = int(row)
+
+                # Update the value in the specified cell of the CSV data
+                data[row][column] = value
+
+            return data
+
+        # Print an error message if there's an issue with the changes
+        except ValueError or IndexError:
+            print("\nInvalid change, please retry!")
+            return None
+    
     def save_file(self, data_to_save):
         if self.destination.endswith('.json'):
             self.save_json(data_to_save)
@@ -181,7 +231,7 @@ class Pickle(Main):
         except FileNotFoundError:
             print("\nDirectory not found.")
             # sys.exit(1)
-
+    
     def read_pickle(self):
         try:
             with open(self.source, 'rb') as picklefile:
@@ -204,12 +254,37 @@ class Pickle(Main):
         # If data is a list of lists, print it as a table
         for row in data:
             print(','.join(str(cell) for cell in row))
+    
+    def apply_changes(self, data):
+        # Method to apply changes to the data
+        if data is None:
+            print("\nCannot apply changes. Data not available.")
+            return None
+        
+        try:
+            for change in self.changes:
+                # Split each change into its components: column, row, and value
+                column, row, value = map(str.strip, change.split(","))
 
+                # Convert column and row to integers
+                column = int(column)
+                row = int(row)
+
+                # Update the value in the specified cell of the CSV data
+                data[row][column] = value
+
+            return data
+
+        # Print an error message if there's an issue with the changes
+        except ValueError or IndexError:
+            print("\nInvalid change, please retry!")
+            return None
+    
     def save_file(self, data_to_save):
         if self.destination.endswith('.pickle'):
             self.save_pickle(data_to_save)
         else:
-            print("Unsupported destination file type.")    
+            print("Unsupported destination file type.")
 
     def save_pickle(self, data_pickle):
         try:
@@ -220,34 +295,7 @@ class Pickle(Main):
                 print("")
         except IOError:
             print(f"Error writing to file: {self.destination}")
-
-def apply_changes(self, data):
-    # Method to apply changes to the data
-    if data is None:
-        print("\nCannot apply changes. Data not available.")
-        return None
     
-    try:
-        for change in self.changes:
-            # Split each change into its components: column, row, and value
-            column, row, value = map(str.strip, change.split(","))
-
-            # Convert column and row to integers
-            column = int(column)
-            row = int(row)
-
-            # Update the value in the specified cell of the CSV data
-            data[row][column] = value
-
-        return data
-
-    # Print an error message if there's an issue with the changes
-    except ValueError or IndexError:
-        print("\nInvalid change, please retry!")
-        return None
-
-
-
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python3 reader.py source_file destination_file change1 change2 change3 change4 (Support up to 4 changes at the time)")
@@ -266,8 +314,51 @@ if __name__ == "__main__":
 
     reader = Main(Csv, Json, Pickle)
 
-    data = reader.read_file()
+    # data = reader.source, reader.destination, reader.changes
 
-    modified_data = reader.apply_changes(data)
+    # modified_data = reader.
 
-    reader.save_file(modified_data)
+    # data = reader.read_file()
+
+    # modified_data = reader.apply_changes(data)
+
+    # reader.save_file(modified_data)
+
+
+    if source_file.endswith('.csv'):
+        reader_instance = Csv(source_file, destination_file, changes)
+    elif source_file.endswith('.json'):
+        reader_instance = Json(source_file, destination_file, changes)
+    elif source_file.endswith('.pickle'):
+        reader_instance = Pickle(source_file, destination_file, changes)
+    else:
+        print("Unsupported file type.")
+        sys.exit(1)
+
+    data = reader_instance.read_file()
+    modified_data = reader_instance.apply_changes(data)
+    reader_instance.save_file(modified_data)
+
+    if source_file.endswith('.csv'):
+        reader_class = Csv
+    elif source_file.endswith('.json'):
+        reader_class = Json
+    elif source_file.endswith('.pickle'):
+        reader_class = Pickle
+    else:
+        print("Unsupported source file type.")
+        sys.exit(1)
+
+    reader_instance = reader_class(source_file, destination_file, changes)
+    data = reader_instance.read_file()
+    modified_data = reader_instance.apply_changes(data)
+
+    if destination_file.endswith('.csv'):
+        reader_instance.save_csv(modified_data)
+    elif destination_file.endswith('.json'):
+        reader_instance.save_json(modified_data)
+    elif destination_file.endswith('.pickle'):
+        reader_instance.save_pickle(modified_data)
+    else:
+        print("Unsupported destination file type.")
+        sys.exit(1)

@@ -12,3 +12,9 @@ with open("in.pickle", "wb") as picklefile:
     pickle.dump(data, picklefile)
 
 
+# j = [1,2,[3,4,5],6,7,[8,9,10]]
+# x = len(set([2,3,4,5,7,8,2,3,2,3]))
+# f = j[5][2] + j[4]
+
+
+# print(f + x)

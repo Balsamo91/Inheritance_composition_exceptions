@@ -518,24 +518,39 @@ if __name__ == "__main__":
         print("No changes provided!")
         sys.exit(1)
 
-    # reader = Main(Csv, Json, Pickle)
-
-    # data = reader.source, reader.destination, reader.changes
-
-    # modified_data = reader.
-
-    # data = reader.read_file()
-
-    # modified_data = reader.apply_changes(data)
-
-    # reader.save_file(modified_data)
-
 
     if source_file.endswith('.csv'):
+        data = [
+            ["door", 3, 7, 0],
+            ["sand", 12, 5, 1],
+            ["brush", 22, 34, 5],
+            ["poster", "red", 8, "stick"]
+        ]
+        with open(source_file, "w", newline='') as csv_file:
+            writer_csv = csv.writer(csv_file)
+            writer_csv.writerows(data)
         reader_instance = Csv(source_file, destination_file, changes)
+
     elif source_file.endswith('.json'):
+        data = [
+                ["door", 3, 7, 0],
+                ["sand", 12, 5, 1],
+                ["brush", 22, 34, 5],
+                ["poster", "red", 8, "stick"]
+            ]
+        with open(source_file, "w") as jsonfile:
+            json.dump(data, jsonfile, indent=4)
         reader_instance = Json(source_file, destination_file, changes)
+
     elif source_file.endswith('.pickle'):
+        data = [
+                ["door", 3, 7, 0],
+                ["sand", 12, 5, 1],
+                ["brush", 22, 34, 5],
+                ["poster", "red", 8, "stick"]
+            ]
+        with open(source_file, "wb") as picklefile:
+            pickle.dump(data, picklefile)
         reader_instance = Pickle(source_file, destination_file, changes)
     else:
         print("Unsupported file type.")
